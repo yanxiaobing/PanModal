@@ -429,7 +429,7 @@ private extension PanModalPresentationController {
         longFormYPosition = layoutPresentable.longFormYPos
         anchorModalToLongForm = layoutPresentable.anchorModalToLongForm
         extendsPanScrolling = layoutPresentable.allowsExtendedPanScrolling
-
+        
         containerView?.isUserInteractionEnabled = layoutPresentable.isUserInteractionEnabled
     }
 
@@ -455,7 +455,7 @@ private extension PanModalPresentationController {
          offsets it
          */
         scrollView.contentInset.bottom = presentingViewController.bottomLayoutGuide.length
-
+        
         /**
          As we adjust the bounds during `handleScrollViewTopBounce`
          we should assume that contentInsetAdjustmentBehavior will not be correct
@@ -463,6 +463,10 @@ private extension PanModalPresentationController {
         if #available(iOS 11.0, *) {
             scrollView.contentInsetAdjustmentBehavior = .never
         }
+        
+        // MARK: Xbingo加的逻辑，解决垂直抖动问题
+        // 新增给scrollViewYOffset初始值逻辑
+        scrollViewYOffset = -scrollView.contentInset.top
     }
 
 }
@@ -759,7 +763,9 @@ private extension PanModalPresentationController {
      Halts the scroll of a given scroll view & anchors it at the `scrollViewYOffset`
      */
     func haltScrolling(_ scrollView: UIScrollView) {
-        scrollView.setContentOffset(CGPoint(x: 0, y: scrollViewYOffset), animated: false)
+        // MARK: Xbingo加的逻辑，解决水平抖动问题
+        // 源代码：scrollView.setContentOffset(CGPoint(x: 0, y: scrollViewYOffset), animated: false)
+        scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: scrollViewYOffset), animated: false)
         scrollView.showsVerticalScrollIndicator = false
     }
 
@@ -768,7 +774,9 @@ private extension PanModalPresentationController {
      This helps halt scrolling when we want to hold the scroll view in place.
      */
     func trackScrolling(_ scrollView: UIScrollView) {
-        scrollViewYOffset = max(scrollView.contentOffset.y, 0)
+        // MARK: Xbingo加的逻辑，解决垂直抖动问题
+        // 源代码：scrollViewYOffset = max(scrollView.contentOffset.y, 0)
+        scrollViewYOffset = max(scrollView.contentOffset.y, -scrollView.contentInset.top)
         scrollView.showsVerticalScrollIndicator = true
     }
 
@@ -804,7 +812,9 @@ private extension PanModalPresentationController {
              */
             presentedView.frame.origin.y = longFormYPosition - yOffset
         } else {
-            scrollViewYOffset = 0
+            // MARK: Xbingo加的逻辑，解决垂直抖动问题
+            // 源代码：scrollViewYOffset = 0
+            scrollViewYOffset = -scrollView.contentInset.top
             snap(toYPosition: longFormYPosition)
         }
 
