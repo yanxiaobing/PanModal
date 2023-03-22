@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'PanModal-Xbingo'
-  s.version          = '10.0.1'
+  s.version          = '10.0.2'
   s.summary          = 'Update PanModalPresentationController to support contentInsert'
 
 # This description is used to generate tags and improve search results.
