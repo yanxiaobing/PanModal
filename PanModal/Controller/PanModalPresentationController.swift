@@ -618,7 +618,7 @@ private extension PanModalPresentationController {
         guard
             isPresentedViewAnchored,
             let scrollView = presentable?.panScrollable,
-            scrollView.contentOffset.y > 0
+            scrollView.contentOffset.y > -scrollView.contentInset.top
             else {
                 return false
         }
@@ -724,7 +724,7 @@ private extension PanModalPresentationController {
             !presentedViewController.isBeingPresented
             else { return }
 
-        if !isPresentedViewAnchored && scrollView.contentOffset.y > 0 {
+        if !isPresentedViewAnchored && scrollView.contentOffset.y > -scrollView.contentInset.top {
 
             /**
              Hold the scrollView in place if we're actively scrolling and not handling top bounce
@@ -747,7 +747,7 @@ private extension PanModalPresentationController {
             }
 
         } else if presentedViewController.view.isKind(of: UIScrollView.self)
-            && !isPresentedViewAnimating && scrollView.contentOffset.y <= 0 {
+                    && !isPresentedViewAnimating && scrollView.contentOffset.y <= -scrollView.contentInset.top {
 
             /**
              In the case where we drag down quickly on the scroll view and let go,
